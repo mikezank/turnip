@@ -1,5 +1,6 @@
 package me.zsoft.turnip;
 
+import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -20,8 +21,8 @@ import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
 
-public class MainActivity extends AppCompatActivity {
-        //implements ServerRequestFragment.OnServerCommand {
+public class MainActivity extends AppCompatActivity
+        implements NameFragment.OnNameEntered {
 
     static ServerRequestFragment mRequestFragment;
     FragmentManager mFragmentManager;
@@ -38,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     static GridLayout mBoardLayout;
     static PuzzleBoard mBoard;
     static String mLetter;
+    static String mPlayerName;
+    static boolean mPlayerIsMale;
 
     private final MainHandler mHandler = new MainHandler(this);
 
@@ -90,6 +93,10 @@ public class MainActivity extends AppCompatActivity {
             mRequestFragment = new ServerRequestFragment();
             mFragmentManager.beginTransaction().add(mRequestFragment, "request").commit();
         }
+
+        // start the NameFragment
+        DialogFragment nameFragment = NameFragment.newInstance("x", "y");
+        nameFragment.show(mFragmentManager, "name");
     }
 
     @Override
@@ -118,6 +125,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void updateCommand(String command) {mCommandText.setText(command); }
+
+    public static String getPlayerName() {
+        return mPlayerName;
+    }
 
     private static class PuzzleBoard {
 
@@ -173,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (command[0]) {
                     case "ready":
-                        sendReply("Mike");
+                        sendReply(getPlayerName());
                         //mGC.setName("Mike");
                         updateCommand("Ready to play!");
                         break;
@@ -270,5 +281,10 @@ public class MainActivity extends AppCompatActivity {
         public void setReply(String reply) {
             this.reply = reply;
         }
+    }
+
+    public void onNameEntered(String name, boolean isMale) {
+        mPlayerName = name;
+        mPlayerIsMale = isMale;
     }
 }
